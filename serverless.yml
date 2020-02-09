@@ -1,0 +1,38 @@
+service:
+  name: taskhub
+  
+package:
+  individually: true
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: prod
+  region: us-east-2
+  environment:
+    tableName: tasks
+    
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:cognito-idp:us-east-2:390432568091:userpool/us-east-2_vplE4JBpn"
+
+functions:
+  createTask:
+    handler: createTask.main
+    events:
+      - http:
+          path: notes
+          method: post
+          cors: true
+          authorizer: aws_iam
